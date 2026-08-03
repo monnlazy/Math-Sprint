@@ -1,0 +1,913 @@
+/* ==========================================================================
+   MULTIPLICATION ADVENTURE — STYLESHEET
+   Struktur file:
+   1. Reset & Design Tokens
+   2. Base / Body / Background
+   3. Splash Screen
+   4. Layout Umum (App, Screen, Card)
+   5. Tombol (Buttons)
+   6. Home Screen
+   7. Learn Mode
+   8. Leaderboard
+   9. Settings
+   10. Name Input
+   11. Gameplay HUD (level, nyawa, skor, timer, progress)
+   12. Kartu Soal & Jawaban
+   13. Efek (FX: bintang, shake, confetti)
+   14. Level Complete & Result Screen
+   15. Animasi (Keyframes)
+   16. Responsif (Mobile / Tablet / Desktop)
+   17. Dark Mode
+   18. Reduced Motion / Aksesibilitas
+   ========================================================================== */
+
+/* ==========================================================================
+   1. RESET & DESIGN TOKENS
+   ========================================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  /* Palet warna "taman bermain" */
+  --sky: #2FB6E0;
+  --sky-deep: #4A90E2;
+  --yellow: #FFC93C;
+  --pink: #FF6B9D;
+  --teal: #2EC4B6;
+  --plum: #2D3047;
+  --white: #FFFFFF;
+  --cream: #FFFDF7;
+  --red: #FF5470;
+  --green: #35C97E;
+
+  /* Permukaan / Teks (mode terang) */
+  --bg-overlay: rgba(74, 144, 226, 0.35);
+  --card-bg: var(--cream);
+  --text-main: var(--plum);
+  --text-muted: #6b6f8a;
+  --shadow-soft: 0 10px 30px rgba(45, 48, 71, 0.18);
+  --shadow-btn: 0 6px 0 rgba(45, 48, 71, 0.25);
+
+  /* Tipografi */
+  --font-display: 'Fredoka', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+
+  /* Radius & spacing */
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+}
+
+body.dark-mode {
+  --bg-overlay: rgba(20, 22, 40, 0.72);
+  --card-bg: #232541;
+  --text-main: #F1F1FA;
+  --text-muted: #A9ACC7;
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --shadow-btn: 0 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   2. BASE / BODY / BACKGROUND
+   ========================================================================== */
+html, body {
+  height: 100%;
+  font-family: var(--font-body);
+  color: var(--text-main);
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  transition: background-color 0.4s ease;
+}
+
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image: url('image/background.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.bg-decor::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--bg-overlay);
+  transition: background-color 0.4s ease;
+}
+
+/* ==========================================================================
+   3. SPLASH SCREEN
+   ========================================================================== */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: linear-gradient(160deg, var(--sky-deep), var(--sky) 55%, var(--teal));
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.splash-screen.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash-logo {
+  width: 140px;
+  height: 140px;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.25));
+}
+
+.splash-text {
+  color: var(--white);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+}
+
+.splash-loader {
+  width: 200px;
+  height: 10px;
+  background: rgba(255,255,255,0.35);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.splash-loader-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--yellow);
+  border-radius: 999px;
+  animation: loaderFill 1.4s ease forwards;
+}
+
+/* ==========================================================================
+   4. LAYOUT UMUM
+   ========================================================================== */
+.app {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px 40px;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.app.hidden { opacity: 0; pointer-events: none; }
+
+.screen {
+  width: 100%;
+  max-width: 720px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  animation: screenIn 0.45s ease;
+}
+
+.screen.active-screen { display: flex; }
+
+.card {
+  width: 100%;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 32px 28px;
+  position: relative;
+  transition: background-color 0.4s ease;
+}
+
+.panel-narrow { max-width: 460px; margin: 0 auto; }
+.center-text { text-align: center; }
+
+/* ==========================================================================
+   5. TOMBOL
+   ========================================================================== */
+.btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 16px 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--white);
+  box-shadow: var(--shadow-btn);
+  transform: translateY(0);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  width: 100%;
+}
+
+.btn:hover { filter: brightness(1.06); }
+.btn:active {
+  transform: translateY(5px);
+  box-shadow: 0 1px 0 rgba(45,48,71,0.25);
+}
+
+.btn-icon { font-size: 1.15em; line-height: 1; }
+
+.btn-primary { background: linear-gradient(135deg, var(--pink), #ff4f8b); }
+.btn-secondary { background: linear-gradient(135deg, var(--sky), var(--sky-deep)); }
+.btn-tertiary { background: linear-gradient(135deg, var(--yellow), #ffb100); color: var(--plum); box-shadow: 0 6px 0 rgba(255,177,0,0.45); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-main);
+  border: 2px solid rgba(45,48,71,0.18);
+  box-shadow: none;
+}
+.btn-ghost:active { transform: translateY(2px); }
+.btn-danger { background: linear-gradient(135deg, var(--red), #d6284a); margin-top: 18px; }
+
+.btn-small { padding: 10px 16px; font-size: 0.9rem; margin-top: 14px; width: auto; }
+
+.btn-back {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  transition: background 0.15s ease;
+}
+.btn-back:hover { background: rgba(45,48,71,0.08); }
+
+.btn-back-round {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.85);
+  color: var(--plum);
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+/* ==========================================================================
+   6. HOME SCREEN
+   ========================================================================== */
+.home-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding-bottom: 36px;
+}
+
+.home-logo {
+  width: 96px;
+  height: 96px;
+  margin-bottom: 6px;
+}
+
+.game-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  color: var(--text-main);
+  line-height: 1.1;
+}
+
+.game-subtitle {
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.home-mascot {
+  width: 110px;
+  margin: 10px 0 18px;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 340px;
+}
+
+/* ==========================================================================
+   7. LEARN MODE
+   ========================================================================== */
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.panel-subtitle {
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 18px;
+}
+
+.learn-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.learn-chip {
+  font-family: var(--font-display);
+  font-weight: 600;
+  border: none;
+  background: rgba(45,48,71,0.08);
+  color: var(--text-main);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.learn-chip:hover { transform: scale(1.08); }
+.learn-chip.active-chip {
+  background: linear-gradient(135deg, var(--teal), #1ea89a);
+  color: var(--white);
+  transform: scale(1.1);
+}
+
+.learn-illustration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 18px;
+  background: rgba(46,196,182,0.1);
+  border-radius: var(--radius-md);
+}
+
+.dot-array {
+  display: grid;
+  gap: 6px;
+  justify-content: center;
+}
+
+.dot-array span {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--pink);
+  animation: dotPop 0.3s ease both;
+}
+
+.learn-equation {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--text-main);
+}
+
+.learn-table-wrap {
+  max-height: 320px;
+  overflow-y: auto;
+  border-radius: var(--radius-sm);
+}
+
+.learn-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.learn-table td {
+  padding: 10px 8px;
+  text-align: center;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(45,48,71,0.08);
+  font-size: 0.95rem;
+}
+
+.learn-table tr:nth-child(even) { background: rgba(74,144,226,0.06); }
+
+/* ==========================================================================
+   8. LEADERBOARD
+   ========================================================================== */
+.leaderboard-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(74,144,226,0.08);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+}
+
+.leaderboard-rank {
+  font-family: var(--font-display);
+  font-weight: 700;
+  width: 28px;
+  color: var(--sky-deep);
+}
+
+.leaderboard-name { flex: 1; font-weight: 800; }
+.leaderboard-score { font-weight: 800; color: var(--pink); }
+.leaderboard-date { font-size: 0.75rem; color: var(--text-muted); }
+
+.leaderboard-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 700;
+  padding: 30px 0;
+}
+
+/* ==========================================================================
+   9. SETTINGS
+   ========================================================================== */
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 4px;
+  border-bottom: 1px solid rgba(45,48,71,0.1);
+}
+
+.setting-label { font-weight: 800; }
+
+.switch { position: relative; width: 52px; height: 30px; display: inline-block; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch-slider {
+  position: absolute;
+  inset: 0;
+  background: #cfd3e6;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.switch-slider::before {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  left: 3px;
+  top: 3px;
+  background: var(--white);
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+}
+.switch input:checked + .switch-slider { background: var(--teal); }
+.switch input:checked + .switch-slider::before { transform: translateX(22px); }
+
+/* ==========================================================================
+   10. NAME INPUT
+   ========================================================================== */
+.name-input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  border: 2px solid rgba(45,48,71,0.15);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 18px;
+  background: transparent;
+  color: var(--text-main);
+}
+.name-input:focus {
+  outline: none;
+  border-color: var(--teal);
+}
+
+/* ==========================================================================
+   11. GAMEPLAY HUD
+   ========================================================================== */
+#screen-game { max-width: 480px; }
+
+.game-hud {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.hud-level, .hud-score {
+  background: var(--card-bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+  min-width: 70px;
+}
+
+.hud-label {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hud-value {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--text-main);
+}
+
+.hud-hearts {
+  display: flex;
+  gap: 4px;
+  background: var(--card-bg);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  box-shadow: var(--shadow-soft);
+}
+
+.heart-icon {
+  width: 22px;
+  height: 22px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.heart-icon.lost {
+  opacity: 0.15;
+  transform: scale(0.6) rotate(-15deg);
+}
+
+.level-progress-wrap {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.level-progress-bar {
+  flex: 1;
+  height: 12px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.12);
+}
+
+.level-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--teal), var(--sky));
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.level-progress-text {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.timer-wrap {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 14px;
+}
+
+.timer-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+.timer-ring-bg {
+  fill: none;
+  stroke: rgba(255,255,255,0.4);
+  stroke-width: 8;
+}
+
+.timer-ring-fg {
+  fill: none;
+  stroke: var(--yellow);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 283;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+}
+
+.timer-ring-fg.urgent { stroke: var(--red); }
+
+.timer-number {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--white);
+  text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* ==========================================================================
+   12. KARTU SOAL & JAWABAN
+   ========================================================================== */
+.game-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-mascot {
+  width: 64px;
+  position: absolute;
+  top: -10px;
+  right: 14px;
+  transform: rotate(8deg);
+}
+
+.question-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 8vw, 2.4rem);
+  color: var(--text-main);
+  text-align: center;
+}
+
+.answers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+}
+
+.answer-btn {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 18px 10px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: rgba(74,144,226,0.12);
+  color: var(--text-main);
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(45,48,71,0.12);
+  transition: transform 0.12s ease, background 0.15s ease, box-shadow 0.12s ease;
+}
+
+.answer-btn:hover:not(:disabled) { transform: translateY(-2px); }
+.answer-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 rgba(45,48,71,0.12); }
+
+.answer-btn.correct-answer {
+  background: linear-gradient(135deg, var(--green), #1fa768);
+  color: var(--white);
+  animation: correctPulse 0.4s ease;
+}
+
+.answer-btn.wrong-answer {
+  background: linear-gradient(135deg, var(--red), #d6284a);
+  color: var(--white);
+}
+
+.answer-btn:disabled { cursor: default; opacity: 0.85; }
+
+/* ==========================================================================
+   13. EFEK (FX)
+   ========================================================================== */
+.fx-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.fx-star {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  animation: fxStarPop 0.8s ease forwards;
+}
+
+.shake-anim { animation: shake 0.4s ease; }
+
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  border-radius: 3px;
+  animation: confettiFall linear forwards;
+}
+
+/* ==========================================================================
+   14. LEVEL COMPLETE & RESULT SCREEN
+   ========================================================================== */
+.result-icon {
+  width: 90px;
+  margin: 0 auto 10px;
+}
+
+.result-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.result-stat {
+  background: rgba(74,144,226,0.08);
+  border-radius: var(--radius-sm);
+  padding: 14px 8px;
+}
+
+.result-stat-value {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--pink);
+}
+
+.result-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.result-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--yellow), #ffb100);
+  color: var(--plum);
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 22px;
+}
+
+.badge-emoji { font-size: 1.4rem; }
+
+.result-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ==========================================================================
+   15. ANIMASI (KEYFRAMES)
+   ========================================================================== */
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes loaderFill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.float-anim { animation: float 3s ease-in-out infinite; }
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+.wiggle-anim { animation: wiggle 2.4s ease-in-out infinite; }
+
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.bounce-in { animation: bounceIn 0.6s cubic-bezier(.34,1.56,.64,1); }
+
+@keyframes spinIn {
+  from { transform: rotate(-180deg) scale(0.4); opacity: 0; }
+  to { transform: rotate(0) scale(1); opacity: 1; }
+}
+.spin-in { animation: spinIn 0.6s ease; }
+
+@keyframes dotPop {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes correctPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+@keyframes fxStarPop {
+  0% { transform: translateY(0) scale(0.4) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-90px) scale(1.2) rotate(90deg); opacity: 0; }
+}
+
+@keyframes confettiFall {
+  to { transform: translateY(110vh) rotate(540deg); opacity: 0.9; }
+}
+
+/* ==========================================================================
+   16. RESPONSIF
+   ========================================================================== */
+
+/* Tablet */
+@media (min-width: 600px) {
+  .menu-buttons { max-width: 380px; }
+  .answers-grid { gap: 18px; }
+  .result-buttons { flex-direction: row; }
+  .result-buttons .btn { flex: 1; }
+}
+
+/* Desktop */
+@media (min-width: 900px) {
+  .card { padding: 44px 48px; }
+  .home-logo { width: 120px; height: 120px; }
+  .home-mascot { width: 130px; }
+  .question-text { font-size: 2.6rem; }
+  .answer-btn { font-size: 1.4rem; padding: 22px 14px; }
+}
+
+/* Mobile kecil */
+@media (max-width: 380px) {
+  .card { padding: 24px 18px; }
+  .answer-btn { font-size: 1.1rem; padding: 14px 8px; }
+  .menu-buttons { max-width: 100%; }
+}
+
+/* ==========================================================================
+   17. DARK MODE (tambahan spesifik selain variabel)
+   ========================================================================== */
+body.dark-mode .bg-decor::after { background: var(--bg-overlay); }
+body.dark-mode .answer-btn { background: rgba(255,255,255,0.06); }
+body.dark-mode .learn-chip { background: rgba(255,255,255,0.08); color: var(--text-main); }
+body.dark-mode .result-stat,
+body.dark-mode .leaderboard-item,
+body.dark-mode .learn-illustration { background: rgba(255,255,255,0.06); }
+body.dark-mode .hud-level,
+body.dark-mode .hud-score,
+body.dark-mode .hud-hearts { background: var(--card-bg); }
+
+/* ==========================================================================
+   18. REDUCED MOTION / AKSESIBILITAS
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 2px;
+}

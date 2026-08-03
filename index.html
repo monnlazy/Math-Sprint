@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Multiplication Adventure — Belajar Perkalian 1-10</title>
+  <meta name="description" content="Game edukasi belajar perkalian 1-10 untuk anak SD">
+
+  <!-- Google Fonts: Fredoka (display, playful/rounded) + Nunito (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="icon" href="image/logo.png" type="image/png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       SPLASH SCREEN (shown briefly on first load)
+  ============================================================= -->
+  <div id="splash-screen" class="screen splash-screen">
+    <img src="image/logo.png" alt="Logo" class="splash-logo bounce-in">
+    <p class="splash-text">Menyiapkan petualangan angka...</p>
+    <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+  </div>
+
+  <!-- ============================================================
+       BACKGROUND LAYER (decorative, fixed behind all screens)
+  ============================================================= -->
+  <div class="bg-decor" aria-hidden="true"></div>
+
+  <!-- ============================================================
+       APP ROOT — all screens live here, only one visible at a time
+  ============================================================= -->
+  <main id="app" class="app hidden">
+
+    <!-- ---------------- HOME SCREEN ---------------- -->
+    <section id="screen-home" class="screen active-screen">
+      <div class="home-card card">
+        <img src="image/logo.png" alt="Multiplication Adventure" class="home-logo float-anim">
+        <h1 class="game-title">Multiplication Adventure</h1>
+        <p class="game-subtitle">Belajar Perkalian 1–10 Sambil Bermain</p>
+
+        <img src="image/mascot.png" alt="Maskot" class="home-mascot wiggle-anim">
+
+        <nav class="menu-buttons">
+          <button class="btn btn-primary" data-action="go-play">
+            <span class="btn-icon">▶</span> Mulai Bermain
+          </button>
+          <button class="btn btn-secondary" data-action="go-learn">
+            <span class="btn-icon">📖</span> Mode Belajar
+          </button>
+          <button class="btn btn-tertiary" data-action="go-leaderboard">
+            <span class="btn-icon">🏆</span> Skor Tertinggi
+          </button>
+          <button class="btn btn-ghost" data-action="go-settings">
+            <span class="btn-icon">⚙</span> Pengaturan
+          </button>
+        </nav>
+      </div>
+    </section>
+
+    <!-- ---------------- LEARN MODE SCREEN ---------------- -->
+    <section id="screen-learn" class="screen">
+      <div class="panel card">
+        <button class="btn-back" data-action="go-home" aria-label="Kembali">← Kembali</button>
+        <h2 class="panel-title">📖 Mode Belajar</h2>
+        <p class="panel-subtitle">Pilih tabel perkalian untuk dipelajari</p>
+
+        <div class="learn-selector" id="learn-selector">
+          <!-- number chips 1-10 injected by JS -->
+        </div>
+
+        <div class="learn-illustration">
+          <div class="dot-array" id="dot-array" aria-hidden="true"></div>
+          <p class="learn-equation" id="learn-equation">1 × 1 = 1</p>
+        </div>
+
+        <div class="learn-table-wrap">
+          <table class="learn-table" id="learn-table">
+            <!-- rows injected by JS -->
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------------- LEADERBOARD SCREEN ---------------- -->
+    <section id="screen-leaderboard" class="screen">
+      <div class="panel card">
+        <button class="btn-back" data-action="go-home" aria-label="Kembali">← Kembali</button>
+        <h2 class="panel-title">🏆 Skor Tertinggi</h2>
+        <p class="panel-subtitle">10 skor terbaik sepanjang masa</p>
+        <ol class="leaderboard-list" id="leaderboard-list">
+          <!-- entries injected by JS -->
+        </ol>
+        <button class="btn btn-ghost btn-small" data-action="clear-leaderboard">🗑 Hapus Papan Skor</button>
+      </div>
+    </section>
+
+    <!-- ---------------- SETTINGS SCREEN ---------------- -->
+    <section id="screen-settings" class="screen">
+      <div class="panel card">
+        <button class="btn-back" data-action="go-home" aria-label="Kembali">← Kembali</button>
+        <h2 class="panel-title">⚙ Pengaturan</h2>
+
+        <div class="setting-row">
+          <span class="setting-label">🎵 Musik</span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-music" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <span class="setting-label">🔊 Efek Suara</span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-sfx" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <span class="setting-label">🌙 Mode Gelap</span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-dark">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <button class="btn btn-danger" data-action="reset-score">↺ Reset Skor &amp; Papan Skor</button>
+      </div>
+    </section>
+
+    <!-- ---------------- PLAYER NAME MODAL (before starting play) ---------------- -->
+    <section id="screen-nameinput" class="screen">
+      <div class="panel card panel-narrow">
+        <button class="btn-back" data-action="go-home" aria-label="Kembali">← Kembali</button>
+        <h2 class="panel-title">✏ Siapa Namamu?</h2>
+        <p class="panel-subtitle">Nama ini akan muncul di papan skor</p>
+        <input type="text" id="player-name-input" class="name-input" maxlength="16" placeholder="Nama Pemain">
+        <button class="btn btn-primary" data-action="confirm-name">Mulai Level 1 🚀</button>
+      </div>
+    </section>
+
+    <!-- ---------------- GAMEPLAY SCREEN ---------------- -->
+    <section id="screen-game" class="screen">
+      <div class="game-hud">
+        <button class="btn-back btn-back-round" data-action="quit-game" aria-label="Keluar">✕</button>
+
+        <div class="hud-level">
+          <span class="hud-label">Level</span>
+          <span class="hud-value" id="hud-level">1</span>
+        </div>
+
+        <div class="hud-hearts" id="hud-hearts" aria-label="Nyawa">
+          <img src="image/heart.png" alt="" class="heart-icon">
+          <img src="image/heart.png" alt="" class="heart-icon">
+          <img src="image/heart.png" alt="" class="heart-icon">
+        </div>
+
+        <div class="hud-score">
+          <span class="hud-label">Skor</span>
+          <span class="hud-value" id="hud-score">0</span>
+        </div>
+      </div>
+
+      <div class="level-progress-wrap">
+        <div class="level-progress-bar"><div class="level-progress-fill" id="level-progress-fill"></div></div>
+        <span class="level-progress-text" id="level-progress-text">Soal 1 / 8</span>
+      </div>
+
+      <div class="timer-wrap">
+        <svg class="timer-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <circle class="timer-ring-bg" cx="50" cy="50" r="45"></circle>
+          <circle class="timer-ring-fg" id="timer-ring-fg" cx="50" cy="50" r="45"></circle>
+        </svg>
+        <span class="timer-number" id="timer-number">10</span>
+      </div>
+
+      <div class="game-card card" id="game-card">
+        <img src="image/mascot.png" alt="" class="game-mascot" id="game-mascot">
+        <p class="question-text" id="question-text">7 × 8 = ?</p>
+
+        <div class="answers-grid" id="answers-grid">
+          <!-- 4 answer buttons injected by JS -->
+        </div>
+      </div>
+
+      <!-- floating feedback fx layer -->
+      <div class="fx-layer" id="fx-layer" aria-hidden="true"></div>
+    </section>
+
+    <!-- ---------------- LEVEL COMPLETE SCREEN ---------------- -->
+    <section id="screen-levelcomplete" class="screen">
+      <div class="panel card panel-narrow center-text">
+        <img src="image/star.png" alt="" class="result-icon spin-in">
+        <h2 class="panel-title">Level Selesai! 🎉</h2>
+        <p class="panel-subtitle" id="levelcomplete-text">Kamu menguasai perkalian 1!</p>
+        <button class="btn btn-primary" data-action="next-level">Lanjut Level Berikutnya →</button>
+      </div>
+    </section>
+
+    <!-- ---------------- GAME OVER / RESULT SCREEN ---------------- -->
+    <section id="screen-result" class="screen">
+      <div class="panel card panel-narrow center-text">
+        <img src="image/trophy.png" alt="" class="result-icon bounce-in" id="result-icon">
+        <h2 class="panel-title" id="result-title">Permainan Selesai!</h2>
+
+        <div class="result-stats">
+          <div class="result-stat">
+            <span class="result-stat-value" id="result-score">0</span>
+            <span class="result-stat-label">Skor Akhir</span>
+          </div>
+          <div class="result-stat">
+            <span class="result-stat-value" id="result-correct">0</span>
+            <span class="result-stat-label">Benar</span>
+          </div>
+          <div class="result-stat">
+            <span class="result-stat-value" id="result-wrong">0</span>
+            <span class="result-stat-label">Salah</span>
+          </div>
+          <div class="result-stat">
+            <span class="result-stat-value" id="result-time">0s</span>
+            <span class="result-stat-label">Waktu</span>
+          </div>
+        </div>
+
+        <div class="result-badge" id="result-badge">
+          <span class="badge-emoji">🥉</span>
+          <span class="badge-name">Bronze</span>
+        </div>
+
+        <div class="result-buttons">
+          <button class="btn btn-primary" data-action="go-play">↺ Main Lagi</button>
+          <button class="btn btn-secondary" data-action="go-home">🏠 Menu Utama</button>
+        </div>
+      </div>
+      <div class="confetti-layer" id="confetti-layer" aria-hidden="true"></div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       AUDIO ELEMENTS (preloaded, controlled via JS)
+  ============================================================= -->
+  <audio id="audio-click" src="audio/click.mp3" preload="auto"></audio>
+  <audio id="audio-correct" src="audio/correct.mp3" preload="auto"></audio>
+  <audio id="audio-wrong" src="audio/wrong.mp3" preload="auto"></audio>
+  <audio id="audio-gameover" src="audio/gameover.mp3" preload="auto"></audio>
+  <audio id="audio-victory" src="audio/victory.mp3" preload="auto"></audio>
+  <audio id="audio-countdown" src="audio/countdown.mp3" preload="auto"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
